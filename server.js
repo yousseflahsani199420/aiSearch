@@ -12,6 +12,7 @@ dotenv.config();
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
+const HOST = process.env.HOST || "0.0.0.0";
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
 const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "arcee-ai/trinity-large-preview:free";
 const SUPPORTED_LANGUAGE_LIST =
@@ -335,6 +336,6 @@ app.use(function (err, _req, res, _next) {
   res.status(500).json({ error: "Unexpected server error." });
 });
 
-app.listen(PORT, function () {
-  console.log(`Honest Search running on http://localhost:${PORT}`);
+app.listen(PORT, HOST, function () {
+  console.log(`Honest Search running on http://${HOST}:${PORT}`);
 });
