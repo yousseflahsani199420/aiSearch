@@ -1,0 +1,52 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Honest Search 😈 | Brutally Honest AI Search</title>
+  <meta name="description" content="Honest Search is a parody search engine that gives short, funny, brutally honest AI answers.">
+  <link rel="icon" type="image/svg+xml" href="/evil-logo.svg">
+  <link rel="apple-touch-icon" href="/evil-logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body data-page="home">
+  <main class="page page-home">
+    <section class="hero-panel">
+      <header class="brand-block">
+        <a class="brand" href="/">
+          <img class="brand-logo" src="/evil-logo.svg" alt="Honest Search logo">
+          <span class="brand-text">Honest Search</span>
+        </a>
+        <p class="tagline">Ask anything. Get the brutally honest answer your ego did not request.</p>
+      </header>
+
+      <form id="searchForm" class="search-form" autocomplete="off" novalidate>
+        <label class="sr-only" for="searchInput">Type your question</label>
+        <div class="search-wrap">
+          <input id="searchInput" name="q" type="text" maxlength="500" placeholder="Type your question... then brace yourself." required>
+          <button type="submit" id="searchBtn">Roast Me</button>
+        </div>
+      </form>
+
+      <div class="quick-queries" aria-label="Quick roast suggestions">
+        <button class="quick-chip" type="button" data-query="Why is my life still a mess?">Why is my life still a mess?</button>
+        <button class="quick-chip" type="button" data-query="Can I get rich without doing much?">Can I get rich without doing much?</button>
+        <button class="quick-chip" type="button" data-query="Should I text my ex tonight?">Should I text my ex tonight?</button>
+      </div>
+
+      <nav class="utility-links" aria-label="Site pages">
+        <a href="/about">About Us</a>
+        <a href="/contact">Contact</a>
+        <a href="/privacy-policy">Privacy Policy</a>
+      </nav>
+
+      <p class="footnote">Parody search engine. Brutal honesty included for free.</p>
+    </section>
+  </main>
+
+  <script src="/script.js" defer></script>
+</body>
+</html>

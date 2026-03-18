@@ -1,0 +1,60 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Result | Honest Search 😈</title>
+  <meta name="description" content="Get brutally honest and funny AI results with Honest Search.">
+  <link rel="icon" type="image/svg+xml" href="/evil-logo.svg">
+  <link rel="apple-touch-icon" href="/evil-logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body data-page="result">
+  <main class="page page-result">
+    <header class="result-header">
+      <a class="brand brand-small" href="/">
+        <img class="brand-logo" src="/evil-logo.svg" alt="Honest Search logo">
+        <span class="brand-text">Honest Search</span>
+      </a>
+    </header>
+
+    <form id="searchForm" class="search-form" autocomplete="off" novalidate>
+      <label class="sr-only" for="searchInput">Type your question</label>
+      <div class="search-wrap">
+        <input id="searchInput" name="q" type="text" maxlength="500" placeholder="Ask another question... if your ego survived." required>
+        <button type="submit" id="searchBtn">Roast Me</button>
+      </div>
+    </form>
+
+    <section class="result-card" aria-live="polite" aria-busy="false">
+      <p id="queryHint" class="query-hint hidden"></p>
+      <p id="loadingText" class="loading hidden">Summoning chaos...</p>
+
+      <div id="answerWrap" class="hidden">
+        <p class="result-label">Unfiltered verdict:</p>
+        <p id="answerText" class="answer-text"></p>
+
+        <div class="result-actions">
+          <button type="button" class="btn" id="copyAnswerBtn">Copy roast</button>
+          <button type="button" class="btn" id="shareLinkBtn">Share this chaos</button>
+          <button type="button" class="btn" id="shareShotBtn">Share screenshot</button>
+          <a class="btn btn-link" href="/">Ask another question</a>
+        </div>
+      </div>
+
+      <p id="errorText" class="error-text hidden"></p>
+    </section>
+
+    <nav class="utility-links" aria-label="Site pages">
+      <a href="/about">About Us</a>
+      <a href="/contact">Contact</a>
+      <a href="/privacy-policy">Privacy Policy</a>
+    </nav>
+  </main>
+
+  <script src="/script.js" defer></script>
+</body>
+</html>
