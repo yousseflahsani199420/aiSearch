@@ -6,7 +6,6 @@
 const express = require("express");
 const path = require("path");
 const dotenv = require("dotenv");
-const { franc } = require("franc-min");
 
 dotenv.config();
 
@@ -17,6 +16,15 @@ const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
 const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "arcee-ai/trinity-large-preview:free";
 const SUPPORTED_LANGUAGE_LIST =
   "English, Spanish, French, Arabic, Portuguese, Hindi, Chinese, Japanese, Korean, German, Indonesian, Turkish, Russian, Italian";
+
+let francDetect = null;
+import("franc-min")
+  .then(function (mod) {
+    francDetect = mod && typeof mod.franc === "function" ? mod.franc : null;
+  })
+  .catch(function (error) {
+    console.warn("franc-min dynamic import failed, using heuristic language detection only.", error && error.message ? error.message : error);
+  });
 
 const SYSTEM_PROMPT =
   "You are a brutally honest comedic assistant. Detect the user's language and reply in the same language. " +
@@ -75,7 +83,7 @@ function detectSupportedLanguage(question) {
   if (/\b(paro|você|voce|nao|não|desculpas)\b/i.test(lower)) return "Portuguese";
 
   // Statistical detection for Latin-script languages
-  const detectedCode = franc(text, { minLength: 3 });
+  const detectedCode = typeof francDetect === "function" ? francDetect(text, { minLength: 3 }) : "und";
   if (detectedCode && detectedCode !== "und" && FRANC_LANGUAGE_MAP[detectedCode]) {
     return FRANC_LANGUAGE_MAP[detectedCode];
   }
