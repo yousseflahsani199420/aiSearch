@@ -169,7 +169,7 @@ async function callOpenRouter(messages) {
     headers: {
       Authorization: `Bearer ${OPENROUTER_API_KEY}`,
       "Content-Type": "application/json",
-      "HTTP-Referer": process.env.APP_URL || `http://localhost:${PORT}`,
+      "HTTP-Referer": process.env.APP_URL || CANONICAL_URL,
       "X-Title": "Honest Search"
     },
     body: JSON.stringify({
@@ -427,5 +427,5 @@ app.use(function (err, _req, res, _next) {
 });
 
 app.listen(PORT, HOST, function () {
-  console.log(`Honest Search running on http://${HOST}:${PORT}`);
+  console.log(`Honest Search running on https://${HOST}:${PORT}`);
 });
