@@ -233,6 +233,9 @@ app.use(function (req, res, next) {
   if (!ENABLE_CANONICAL_REDIRECT) {
     return next();
   }
+  if (req.path === "/health") {
+    return next();
+  }
 
   const rawHost = String(req.headers["x-forwarded-host"] || req.headers.host || "")
     .split(",")[0]
