@@ -241,8 +241,18 @@ app.use(function (req, res, next) {
     .split(",")[0]
     .trim();
   const hostname = rawHost.split(":")[0].toLowerCase();
+  const forwardedProto = String(req.headers["x-forwarded-proto"] || req.protocol || "http")
+    .split(",")[0]
+    .trim()
+    .toLowerCase();
+  const isHttps = forwardedProto === "https";
 
-  if (shouldSkipCanonicalRedirect(hostname) || hostname === CANONICAL_HOSTNAME) {
+  if (shouldSkipCanonicalRedirect(hostname)) {
+    return next();
+  }
+
+  const needsCanonicalHost = hostname !== CANONICAL_HOSTNAME;
+  if (!needsCanonicalHost && isHttps) {
     return next();
   }
 
