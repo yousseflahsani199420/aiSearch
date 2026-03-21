@@ -14,6 +14,9 @@ const PORT = Number(process.env.PORT || 3000);
 const HOST = process.env.HOST || "0.0.0.0";
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
 const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "arcee-ai/trinity-large-preview:free";
+const OPENROUTER_FALLBACK_MODELS =
+  process.env.OPENROUTER_FALLBACK_MODELS ||
+  "mistralai/mistral-7b-instruct:free,google/gemma-2-9b-it:free,meta-llama/llama-3.1-8b-instruct:free";
 const CANONICAL_URL = process.env.CANONICAL_URL || "https://www.honestsearch.online";
 const ENABLE_CANONICAL_REDIRECT = process.env.ENABLE_CANONICAL_REDIRECT !== "0";
 const SUPPORTED_LANGUAGE_LIST =
@@ -164,6 +167,37 @@ function fallbackForLanguage(language) {
 }
 
 async function callOpenRouter(messages) {
+  const fallbackModels = OPENROUTER_FALLBACK_MODELS
+    .split(",")
+    .map(function (m) {
+      return String(m || "").trim();
+    })
+    .filter(Boolean);
+
+  const modelsToTry = [OPENROUTER_MODEL].concat(fallbackModels).filter(function (model, index, arr) {
+    return arr.indexOf(model) === index;
+  });
+
+  let lastError = null;
+
+  for (const model of modelsToTry) {
+    try {
+      return await callOpenRouterModel(messages, model);
+    } catch (error) {
+      lastError = error;
+      const status = Number(error && error.status ? error.status : 0);
+      const shouldTryNext = status === 422 || status === 400 || status === 404 || status === 429 || status === 503;
+      if (!shouldTryNext) {
+        throw error;
+      }
+    }
+  }
+
+  const finalMessage = lastError && lastError.message ? lastError.message : "OpenRouter request failed.";
+  throw new Error(`All configured models failed. Last error: ${finalMessage}`);
+}
+
+async function callOpenRouterModel(messages, model) {
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -173,7 +207,7 @@ async function callOpenRouter(messages) {
       "X-Title": "Honest Search"
     },
     body: JSON.stringify({
-      model: OPENROUTER_MODEL,
+      model: model,
       messages: messages,
       max_tokens: 60,
       temperature: 1.0
@@ -186,7 +220,10 @@ async function callOpenRouter(messages) {
 
   if (!response.ok) {
     const providerError = (data && data.error && data.error.message) || data.message || "OpenRouter request failed.";
-    throw new Error(providerError);
+    const error = new Error(providerError);
+    error.status = response.status;
+    error.model = model;
+    throw error;
   }
 
   const rawAnswer =
@@ -199,7 +236,10 @@ async function callOpenRouter(messages) {
       : "";
 
   if (!rawAnswer) {
-    throw new Error("Empty answer from model.");
+    const error = new Error("Empty answer from model.");
+    error.status = 502;
+    error.model = model;
+    throw error;
   }
 
   return rawAnswer;
