@@ -260,6 +260,31 @@ app.use(function (req, res, next) {
   return res.redirect(301, target);
 });
 
+// Enforce HSTS on secure production responses.
+app.use(function (req, res, next) {
+  const forwardedProto = String(req.headers["x-forwarded-proto"] || req.protocol || "http")
+    .split(",")[0]
+    .trim()
+    .toLowerCase();
+  const isHttps = forwardedProto === "https";
+  const rawHost = String(req.headers["x-forwarded-host"] || req.headers.host || "")
+    .split(",")[0]
+    .trim();
+  const hostname = rawHost.split(":")[0].toLowerCase();
+  const isLocalHost =
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname === "::1" ||
+    hostname.endsWith(".local") ||
+    /^\d{1,3}(\.\d{1,3}){3}$/.test(hostname);
+
+  if (isHttps && !isLocalHost) {
+    // 2 years + include subdomains + preload-ready policy.
+    res.setHeader("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
+  }
+  return next();
+});
+
 // Clean error response for malformed JSON bodies
 app.use(function (err, _req, res, next) {
   if (err && err.type === "entity.parse.failed") {
