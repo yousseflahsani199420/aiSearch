@@ -15,3 +15,7 @@ The backend auto-detects language and forces replies in the same language.
 - `style.css` - UI styling
 - `script.js` - frontend logic
 - `server.js` - Express backend and OpenRouter proxy
+
+## Canonical URL redirect
+
+Set `CANONICAL_URL=https://www.honestsearch.online` and `ENABLE_CANONICAL_REDIRECT=1` to force all hosts to redirect to the `www` domain.

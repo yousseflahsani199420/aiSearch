@@ -13,4 +13,8 @@ services:
       - key: OPENROUTER_MODEL
         value: arcee-ai/trinity-large-preview:free
       - key: APP_URL
-        sync: false
+        value: https://www.honestsearch.online
+      - key: CANONICAL_URL
+        value: https://www.honestsearch.online
+      - key: ENABLE_CANONICAL_REDIRECT
+        value: "1"

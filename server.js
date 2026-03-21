@@ -14,8 +14,17 @@ const PORT = Number(process.env.PORT || 3000);
 const HOST = process.env.HOST || "0.0.0.0";
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
 const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "arcee-ai/trinity-large-preview:free";
+const CANONICAL_URL = process.env.CANONICAL_URL || "https://www.honestsearch.online";
+const ENABLE_CANONICAL_REDIRECT = process.env.ENABLE_CANONICAL_REDIRECT !== "0";
 const SUPPORTED_LANGUAGE_LIST =
   "English, Spanish, French, Arabic, Portuguese, Hindi, Chinese, Japanese, Korean, German, Indonesian, Turkish, Russian, Italian";
+const CANONICAL_HOSTNAME = (() => {
+  try {
+    return new URL(CANONICAL_URL).hostname.toLowerCase();
+  } catch {
+    return "www.honestsearch.online";
+  }
+})();
 
 let francDetect = null;
 import("franc-min")
@@ -198,10 +207,45 @@ async function callOpenRouter(messages) {
 
 // Basic security hardening
 app.disable("x-powered-by");
+app.set("trust proxy", true);
 
 // Body parsers
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: false }));
+
+// Canonical domain redirect (production)
+function shouldSkipCanonicalRedirect(hostname) {
+  if (!hostname) return true;
+  const lowered = hostname.toLowerCase();
+  if (lowered === "localhost" || lowered === "127.0.0.1" || lowered === "::1") {
+    return true;
+  }
+  if (lowered.endsWith(".local")) {
+    return true;
+  }
+  if (/^\d{1,3}(\.\d{1,3}){3}$/.test(lowered)) {
+    return true;
+  }
+  return false;
+}
+
+app.use(function (req, res, next) {
+  if (!ENABLE_CANONICAL_REDIRECT) {
+    return next();
+  }
+
+  const rawHost = String(req.headers["x-forwarded-host"] || req.headers.host || "")
+    .split(",")[0]
+    .trim();
+  const hostname = rawHost.split(":")[0].toLowerCase();
+
+  if (shouldSkipCanonicalRedirect(hostname) || hostname === CANONICAL_HOSTNAME) {
+    return next();
+  }
+
+  const target = `${CANONICAL_URL}${req.originalUrl || "/"}`;
+  return res.redirect(301, target);
+});
 
 // Clean error response for malformed JSON bodies
 app.use(function (err, _req, res, next) {
